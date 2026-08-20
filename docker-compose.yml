@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------------
+  # 1. PostgreSQL Database Service (Auto-Healing & Storage Protected)
+  # -------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: menakyapi_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-menak_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-menak_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-menak_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------------
+  # 2. Next.js 16 + Payload CMS 3.x Application Service
+  # -------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: menakyapi_web
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URI: postgres://${POSTGRES_USER:-menak_user}:${POSTGRES_PASSWORD:-menak_pass}@postgres:5432/${POSTGRES_DB:-menak_db}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+    volumes:
+      - media_uploads:/app/media
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.menakyapi.rule=Host(`${DOMAIN_NAME:-menakyapi.com}`)"
+      - "traefik.http.routers.menakyapi.entrypoints=websecure"
+      - "traefik.http.routers.menakyapi.tls.certresolver=letsencrypt"
+
+volumes:
+  postgres_data:
+  media_uploads:

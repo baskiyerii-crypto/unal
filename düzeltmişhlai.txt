@@ -1,0 +1,46 @@
+---
+
+Firma adı: MenakYapı
+Sektör: Çatı sistemleri ve yapı
+Hizmetler/Ürünler: Kenet çatı sistemleri, Çatı yapımı ve montajı, Çatı tadilat ve onarımı, Oluk montajı ve değişimi
+Şehir/Ülke: Ankara, Antalya, Tüm Türkiye illeri
+Hedef kitle: Bireysel, Kurumsal
+Telefon: 05317924006
+WhatsApp: 05317924006
+E-posta: menakyapi@gmail.com
+Web sitesi (mevcut): YOK
+Sosyal medya: UNKNOWN
+Rakipler/Referans siteler: [https://mer-ay.com/cati-sistemleri/](https://mer-ay.com/cati-sistemleri/)
+Dil: Türkçe
+
+--- ÖZELLIK SİNYALLERİ ---
+Rezervasyon/randevu sistemi: HAYIR
+Online ödeme alma: HAYIR
+Fatura/sipariş yönetimi: HAYIR
+Stok/envanter takibi: HAYIR
+Blog/içerik yönetimi: UNKNOWN
+Çok şube/lokasyon: HAYIR
+Çok kullanıcı/rol (admin, editor, müşteri...): UNKNOWN
+Galeri/video: EVET
+E-ticaret (ürün satışı): HAYIR
+Üyelik/kayıt sistemi: HAYIR
+Mobil uygulama ihtiyacı: HAYIR
+CRM/ERP entegrasyonu: HAYIR
+SMS/bildirim sistemi: UNKNOWN
+Kargo entegrasyonu: HAYIR
+Otomatik e-posta/bildirim: UNKNOWN
+Çok dil desteği: UNKNOWN
+PDF/belge üretimi: HAYIR
+Raporlama/dashboard: HAYIR
+
+--- PROJE KAPSAMI ---
+SEO önceliği: YÜKSEK
+Tahmini sayfa sayısı: 6
+Tahmini içerik hacmi: AZ (<10 sayfa)
+Lansman tarihi: UNKNOWN
+Bütçe aralığı: UNKNOWN
+Teknoloji kısıtı: YOK
+Mevcut sistem/altyapı: YOK
+
+--- MÜŞTERİ NOTU ---
+Tasarımda kurumsal renk paleti olan antrasit, gri, yaldız ve beyaz tercih ediliyor. İçerik yazıları yapay zeka ile üretilecek, görseller için stok fotoğraflar kullanılacak. Kullanıcıların WhatsApp butonu, tıkla-ara telefon fonksiyonu ve "Teklif al" ek formu üzerinden iletişime geçmesi hedefleniyor. Sitede "20 yıllık tecrübe, 500+ mutlu müşteri, 15 kişilik uzman ekip" istatistikleri ve detaylı bir kurumsal hikaye (misyon, vizyon) yer alacak. Açık adres: Şehitler caddesi Selahattin Ecevit sokak 36/3 mamak Ankara. Çalışma saatleri: Haftaiçi 08:00 - 17:00.
