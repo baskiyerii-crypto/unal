@@ -3,6 +3,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import sharp from 'sharp';
 
 import { Users } from './lib/payload/collections/Users';
 import { Pages } from './lib/payload/collections/Pages';
@@ -64,5 +65,9 @@ export default buildConfig({
     pool: {
       connectionString: databaseUri,
     },
+    // First-boot / Coolify: create missing tables in empty Postgres.
+    // Prefer formal migrations later; keep push for zero-ops VPS deploy.
+    push: true,
   }),
+  sharp,
 });
