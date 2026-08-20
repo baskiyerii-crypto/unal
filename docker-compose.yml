@@ -45,6 +45,8 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
+    expose:
+      - '3000'
     volumes:
       - media_uploads:/app/media
     labels:
