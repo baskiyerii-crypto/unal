@@ -3,7 +3,6 @@ import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import sharp from 'sharp';
 
 import { Users } from './lib/payload/collections/Users';
 import { Pages } from './lib/payload/collections/Pages';
@@ -37,6 +36,15 @@ const databaseUri =
     return 'postgres://menak_user:menak_pass@localhost:5432/menak_db';
   })();
 
+// Optional: Alpine/Coolify may lack sharp native bindings; never block admin boot.
+type SharpFn = typeof import('sharp').default;
+let sharpInstance: SharpFn | undefined;
+try {
+  sharpInstance = (await import('sharp')).default;
+} catch (error) {
+  console.warn('[WARNING]: sharp unavailable; image resizing disabled:', error);
+}
+
 export default buildConfig({
   admin: {
     user: 'users',
@@ -66,8 +74,7 @@ export default buildConfig({
       connectionString: databaseUri,
     },
     // First-boot / Coolify: create missing tables in empty Postgres.
-    // Prefer formal migrations later; keep push for zero-ops VPS deploy.
     push: true,
   }),
-  sharp,
+  ...(sharpInstance ? { sharp: sharpInstance } : {}),
 });
