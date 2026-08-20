@@ -37,8 +37,12 @@ const databaseUri =
   })();
 
 // Optional: Alpine/Coolify may lack sharp native bindings; never block admin boot.
+<<<<<<< HEAD
 type SharpFn = typeof import('sharp').default;
 let sharpInstance: SharpFn | undefined;
+=======
+let sharpInstance: typeof import('sharp') | undefined;
+>>>>>>> 52b750281e478bb3caab21495fe87ec146fdf24c
 try {
   sharpInstance = (await import('sharp')).default;
 } catch (error) {
