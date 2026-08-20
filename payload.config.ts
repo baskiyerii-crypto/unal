@@ -14,6 +14,7 @@ import { Media } from './lib/payload/collections/Media';
 import { QuoteRequests } from './lib/payload/collections/QuoteRequests';
 import { Posts } from './lib/payload/collections/Posts';
 import { SiteSettings } from './lib/payload/globals/SiteSettings';
+import { migrations } from './migrations';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -73,8 +74,10 @@ export default buildConfig({
     pool: {
       connectionString: databaseUri,
     },
-    // First-boot / Coolify: create missing tables in empty Postgres.
+    // Dev only: auto-sync schema. Production ignores `push` entirely.
     push: true,
+    // Production: run migrations on connect, since `push` is a no-op there.
+    prodMigrations: migrations,
   }),
   ...(sharpInstance ? { sharp: sharpInstance } : {}),
 });
