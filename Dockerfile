@@ -34,11 +34,11 @@ RUN apk add --no-cache libc6-compat \
   && mkdir -p /app/media \
   && chown -R nextjs:nodejs /app/media
 
+# standalone already ships server.js, package.json and the traced
+# node_modules (sharp, @img, pg); Payload itself is bundled into .next chunks.
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 USER nextjs
 
