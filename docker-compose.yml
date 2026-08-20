@@ -6,7 +6,6 @@ services:
   # -------------------------------------------------------------------
   postgres:
     image: postgres:16-alpine
-    container_name: menakyapi_postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-menak_user}
@@ -23,17 +22,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    labels:
+      - traefik.enable=false
 
   # -------------------------------------------------------------------
   # 2. Next.js + Payload CMS Application Service
   # -------------------------------------------------------------------
-  # Coolify owns Host()/TLS via Domains UI. We only tell Traefik the
-  # container listens on 3000 — without this you get "no available server".
+  # Coolify Domains for this service MUST include the container port:
+  #   https://menakyapi.com.tr:3000
+  #   https://www.menakyapi.com.tr:3000
+  # Without :3000 Traefik targets port 80 → "no available server".
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: menakyapi_web
     restart: unless-stopped
     depends_on:
       postgres:
@@ -55,20 +57,11 @@ services:
       - '3000'
     volumes:
       - media_uploads:/app/media
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'node',
-          '-e',
-          "fetch('http://127.0.0.1:3000/').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 40s
     labels:
       - traefik.enable=true
+      # Coolify-generated service names (http-0 / https-0 + resource uuid + service)
+      - traefik.http.services.http-0-${COOLIFY_RESOURCE_UUID:-local}-web.loadbalancer.server.port=3000
+      - traefik.http.services.https-0-${COOLIFY_RESOURCE_UUID:-local}-web.loadbalancer.server.port=3000
       - traefik.http.services.web.loadbalancer.server.port=3000
 
 volumes:
