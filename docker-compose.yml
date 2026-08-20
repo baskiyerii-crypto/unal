@@ -25,8 +25,10 @@ services:
       retries: 5
 
   # -------------------------------------------------------------------
-  # 2. Next.js 16 + Payload CMS 3.x Application Service
+  # 2. Next.js + Payload CMS Application Service
   # -------------------------------------------------------------------
+  # Coolify owns Host()/TLS via Domains UI. We only tell Traefik the
+  # container listens on 3000 — without this you get "no available server".
   web:
     build:
       context: .
@@ -38,9 +40,13 @@ services:
         condition: service_healthy
     environment:
       NODE_ENV: production
+      PORT: '3000'
+      HOSTNAME: '0.0.0.0'
       DATABASE_URI: postgres://${POSTGRES_USER:-menak_user}:${POSTGRES_PASSWORD:-menak_pass}@postgres:5432/${POSTGRES_DB:-menak_db}
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
-      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-https://menakyapi.com.tr}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://menakyapi.com.tr}
+      DOMAIN_NAME: ${DOMAIN_NAME:-menakyapi.com.tr}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
@@ -49,11 +55,21 @@ services:
       - '3000'
     volumes:
       - media_uploads:/app/media
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.menakyapi.rule=Host(`${DOMAIN_NAME:-menakyapi.com}`)"
-      - "traefik.http.routers.menakyapi.entrypoints=websecure"
-      - "traefik.http.routers.menakyapi.tls.certresolver=letsencrypt"
+      - traefik.enable=true
+      - traefik.http.services.web.loadbalancer.server.port=3000
 
 volumes:
   postgres_data:
