@@ -846,8 +846,17 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: number;
-  phone: string;
-  whatsapp: string;
+  /**
+   * Telefon ve WhatsApp ikonlarına basınca bu isimler seçenek olarak çıkar. Her kişinin numarası hem arama hem WhatsApp için kullanılır.
+   */
+  contactPersons: {
+    name: string;
+    /**
+     * Örn: 05317924006 (boşluksuz)
+     */
+    phone: string;
+    id?: string | null;
+  }[];
   whatsappMessage?: string | null;
   email: string;
   address: string;
@@ -870,8 +879,13 @@ export interface SiteSetting {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
-  phone?: T;
-  whatsapp?: T;
+  contactPersons?:
+    | T
+    | {
+        name?: T;
+        phone?: T;
+        id?: T;
+      };
   whatsappMessage?: T;
   email?: T;
   address?: T;

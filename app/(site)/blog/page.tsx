@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getAllPosts, getFeaturedPost, CATEGORY_MAP } from '@/lib/payload/getPosts';
 import { BlogCard } from '@/components/ui/BlogCard';
+import { ContactActionRow } from '@/components/ui/ContactActionRow';
+import { getSiteSettings } from '@/lib/payload/getSiteSettings';
+import { DEFAULT_WHATSAPP_MESSAGE, resolveContactPersons } from '@/lib/utils/contacts';
 
 export const metadata: Metadata = {
   title: 'Blog & Yapı Rehberi — Kenet Çatı, İzolasyon ve İnşaat | MenakYapı',
@@ -25,10 +28,16 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
   const resolvedParams = searchParams ? await searchParams : {};
   const currentCategory = resolvedParams.category || 'all';
 
-  const [allPosts, featuredPost] = await Promise.all([
+  const [allPosts, featuredPost, settings] = await Promise.all([
     getAllPosts(currentCategory),
     getFeaturedPost(),
+    getSiteSettings(),
   ]);
+
+  const contacts = resolveContactPersons(settings);
+  const whatsappMessage =
+    settings?.whatsappMessage ||
+    'Merhaba, blog sayfanızdan ulaşıyorum. Projem için bilgi almak istiyorum.';
 
   const categories = [
     { slug: 'all', label: 'Tüm Yazılar' },
@@ -128,22 +137,10 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
             <p className="text-gray-300 text-xs sm:text-sm font-['Inter'] mb-8 leading-relaxed">
               Sorularınız veya şantiye uygulamalarınız için uzman mühendis kadromuzla doğrudan iletişime geçebilirsiniz.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href="tel:05317924006"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#D4AF37] text-slate-950 font-bold text-sm hover:bg-[#B89628] transition-colors shadow-lg"
-              >
-                0531 792 40 06 Hemen Ara
-              </a>
-              <a
-                href="https://wa.me/905317924006?text=Merhaba,%20blog%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Projem%20i%C3%A7in%20bilgi%20almak%20istiyorum."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-colors"
-              >
-                WhatsApp İle Yazın
-              </a>
-            </div>
+            <ContactActionRow
+              contacts={contacts}
+              whatsappMessage={whatsappMessage || DEFAULT_WHATSAPP_MESSAGE}
+            />
           </div>
         </div>
 

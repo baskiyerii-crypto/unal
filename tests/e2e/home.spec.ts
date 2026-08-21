@@ -15,14 +15,26 @@ test.describe('MenakYapı Homepage & Lead Form E2E Tests', () => {
     await expect(heroHeading).toContainText('Kenet Çatı');
   });
 
-  test('should display contact phone number and WhatsApp links', async ({ page }) => {
-    // Expect phone number 0531 792 40 06 to be visible
-    const phoneLinks = page.locator('a[href^="tel:05317924006"]');
-    await expect(phoneLinks.first()).toBeVisible();
+  test('should open contact picker with named phone and WhatsApp options', async ({ page }) => {
+    const phoneButton = page.getByRole('button', { name: /Telefon ile ulaşın/i });
+    await expect(phoneButton).toBeVisible();
+    await phoneButton.click();
 
-    // Expect WhatsApp link to be present
-    const whatsappLinks = page.locator('a[href*="wa.me"]');
-    await expect(whatsappLinks.first()).toBeVisible();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText(/Kimi aramak istersiniz/i)).toBeVisible();
+
+    const telLinks = dialog.locator('a[href^="tel:"]');
+    await expect(telLinks.first()).toBeVisible();
+    await expect(telLinks).toHaveCount(2);
+
+    await page.getByRole('button', { name: 'Kapat' }).first().click();
+    await expect(dialog).toBeHidden();
+
+    const whatsappButton = page.getByRole('button', { name: /WhatsApp ile teklif alın/i });
+    await whatsappButton.click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog').locator('a[href*="wa.me"]').first()).toBeVisible();
   });
 
   test('should show validation error when submitting quote form without KVKK consent', async ({ page }) => {

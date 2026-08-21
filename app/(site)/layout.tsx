@@ -6,6 +6,11 @@ import { Header } from '@/components/ui/Header';
 import { Footer } from '@/components/ui/Footer';
 import { FloatingContact } from '@/components/ui/FloatingContact';
 import { getSiteSettings } from '@/lib/payload/getSiteSettings';
+import {
+  DEFAULT_WHATSAPP_MESSAGE,
+  normalizePhone,
+  resolveContactPersons,
+} from '@/lib/utils/contacts';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -23,8 +28,17 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'MenakYapı — Kenet Çatı Sistemleri, Yapı & Çatı Tadilatı | Ankara & Antalya',
-  description: 'MenakYapı; Ankara, Antalya ve tüm Türkiye\'de kenet çatı sistemleri, çatı yapımı, oluk değişimi ve izolasyon tadilatında 20 yıllık tecrübesiyle garantili hizmet sunar. Ücretsiz teklif alın!',
-  keywords: ['kenet çatı', 'çatı yapımı', 'çatı tadilatı', 'oluk değişimi', 'ankara çatı ustası', 'antalya kenet çatı', 'menakyapı'],
+  description:
+    "MenakYapı; Ankara, Antalya ve tüm Türkiye'de kenet çatı sistemleri, çatı yapımı, oluk değişimi ve izolasyon tadilatında 20 yıllık tecrübesiyle garantili hizmet sunar. Ücretsiz teklif alın!",
+  keywords: [
+    'kenet çatı',
+    'çatı yapımı',
+    'çatı tadilatı',
+    'oluk değişimi',
+    'ankara çatı ustası',
+    'antalya kenet çatı',
+    'menakyapı',
+  ],
   openGraph: {
     title: 'MenakYapı — Kenet Çatı Sistemleri ve Çatı Çözümleri',
     description: '20 yıllık tecrübe, 500+ tamamlanan proje, %100 su yalıtım garantisi.',
@@ -40,12 +54,17 @@ export default async function SiteLayout({
 }) {
   const settings = await getSiteSettings();
 
-  const phone = settings?.phone || '05317924006';
-  const whatsapp = settings?.whatsapp || '05317924006';
+  const contacts = resolveContactPersons(settings);
+  const primaryPhone = contacts[0]?.phone || '05317924006';
   const email = settings?.email || 'menakyapi@gmail.com';
-  const address = settings?.address || 'Şehitler caddesi Selahattin Ecevit sokak 36/3 Mamak Ankara';
+  const address =
+    settings?.address || 'Şehitler caddesi Selahattin Ecevit sokak 36/3 Mamak Ankara';
+  const workingHours = settings?.workingHours || 'Haftaiçi 08:00 - 17:00';
   const gtmId = settings?.tracking?.gtmId || process.env.NEXT_PUBLIC_GTM_ID;
   const searchConsoleMeta = settings?.tracking?.googleSearchConsoleMeta;
+  const whatsappMessage = settings?.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE;
+
+  const telSchema = `+90${normalizePhone(primaryPhone).replace(/^0/, '')}`;
 
   const jsonLdSchema = {
     '@context': 'https://schema.org',
@@ -54,7 +73,7 @@ export default async function SiteLayout({
     image: 'https://menakyapi.com/images/projects/proje-01.jpg',
     '@id': 'https://menakyapi.com/#organization',
     url: 'https://menakyapi.com',
-    telephone: '+905317924006',
+    telephone: telSchema,
     priceRange: '$$',
     address: {
       '@type': 'PostalAddress',
@@ -93,8 +112,6 @@ export default async function SiteLayout({
     },
   };
 
-  const whatsappMessage = (settings as unknown as { whatsappMessage?: string })?.whatsappMessage;
-
   return (
     <html lang="tr" className={`${outfit.variable} ${inter.variable} scroll-smooth`}>
       <head>
@@ -132,17 +149,17 @@ export default async function SiteLayout({
             </noscript>
           </>
         )}
-        <Header phone={phone} whatsapp={whatsapp} />
+        <Header contacts={contacts} whatsappMessage={whatsappMessage} />
         <main className="grow">{children}</main>
-        <Footer 
-          phone={phone} 
-          whatsapp={whatsapp} 
-          email={email} 
+        <Footer
+          contacts={contacts}
+          whatsappMessage={whatsappMessage}
+          email={email}
           address={address}
+          workingHours={workingHours}
         />
-        <FloatingContact phone={phone} whatsapp={whatsapp} whatsappMessage={whatsappMessage} />
+        <FloatingContact contacts={contacts} whatsappMessage={whatsappMessage} />
       </body>
     </html>
   );
 }
-

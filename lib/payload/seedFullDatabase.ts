@@ -370,12 +370,20 @@ export async function seedFullDatabase() {
       slug: 'site-settings',
     });
 
-    if (!currentSettings || !currentSettings.phone) {
+    const hasContacts =
+      Array.isArray(currentSettings?.contactPersons) &&
+      currentSettings.contactPersons.length > 0;
+
+    if (!currentSettings || !hasContacts) {
       await payload.updateGlobal({
         slug: 'site-settings',
         data: {
-          phone: '05317924006',
-          whatsapp: '05317924006',
+          contactPersons: [
+            { name: 'Merkez Hat', phone: '05317924006' },
+            { name: 'Saha Hat', phone: '05317924006' },
+          ],
+          whatsappMessage:
+            'Merhaba MenakYapı, çatı/kenet çatı hizmetleriniz hakkında ücretsiz teklif ve bilgi almak istiyorum.',
           email: 'menakyapi@gmail.com',
           address: 'Şehitler caddesi Selahattin Ecevit sokak 36/3 Mamak Ankara',
           workingHours: 'Haftaiçi 08:00 - 17:00',
@@ -386,7 +394,7 @@ export async function seedFullDatabase() {
           },
         },
       });
-      console.log('[SEED]: SiteSettings global updated with full company defaults.');
+      console.log('[SEED]: SiteSettings global updated with contact persons.');
     }
 
     // 8. Populate Pages Collection (Anasayfa / Homepage)

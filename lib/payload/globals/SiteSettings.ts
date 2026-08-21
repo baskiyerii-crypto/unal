@@ -8,24 +8,48 @@ export const SiteSettings: GlobalConfig = {
   },
   fields: [
     {
-      name: 'phone',
-      type: 'text',
-      label: 'Telefon Numarası',
-      defaultValue: '05317924006',
+      name: 'contactPersons',
+      type: 'array',
+      label: 'İletişim Kişileri',
+      labels: {
+        singular: 'Kişi',
+        plural: 'Kişiler',
+      },
+      minRows: 1,
+      maxRows: 2,
       required: true,
-    },
-    {
-      name: 'whatsapp',
-      type: 'text',
-      label: 'WhatsApp Numarası',
-      defaultValue: '05317924006',
-      required: true,
+      admin: {
+        description:
+          'Telefon ve WhatsApp ikonlarına basınca bu isimler seçenek olarak çıkar. Her kişinin numarası hem arama hem WhatsApp için kullanılır.',
+      },
+      fields: [
+        {
+          name: 'name',
+          type: 'text',
+          label: 'İsim',
+          required: true,
+        },
+        {
+          name: 'phone',
+          type: 'text',
+          label: 'Telefon / WhatsApp Numarası',
+          required: true,
+          admin: {
+            description: 'Örn: 05317924006 (boşluksuz)',
+          },
+        },
+      ],
+      defaultValue: [
+        { name: 'Merkez Hat', phone: '05317924006' },
+        { name: 'Saha Hat', phone: '05317924006' },
+      ],
     },
     {
       name: 'whatsappMessage',
       type: 'textarea',
-      label: 'WhatsApp Varsayılan Karşılama / Hazır Hazır Mesajı',
-      defaultValue: 'Merhaba MenakYapı, çatı/kenet çatı hizmetleriniz hakkında ücretsiz teklif ve bilgi almak istiyorum.',
+      label: 'WhatsApp Varsayılan Karşılama Mesajı',
+      defaultValue:
+        'Merhaba MenakYapı, çatı/kenet çatı hizmetleriniz hakkında ücretsiz teklif ve bilgi almak istiyorum.',
     },
     {
       name: 'email',

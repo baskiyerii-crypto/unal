@@ -9,6 +9,8 @@ import { StickyCta } from '@/components/ui/StickyCta';
 import { AuthorBio } from '@/components/ui/AuthorBio';
 import { FaqAccordion } from '@/components/ui/FaqAccordion';
 import { BlogCard } from '@/components/ui/BlogCard';
+import { getSiteSettings } from '@/lib/payload/getSiteSettings';
+import { resolveContactPersons } from '@/lib/utils/contacts';
 
 export const revalidate = 3600;
 
@@ -62,11 +64,16 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
 export default async function BlogPostDetailPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const [post, settings] = await Promise.all([getPostBySlug(slug), getSiteSettings()]);
 
   if (!post) {
     notFound();
   }
+
+  const contacts = resolveContactPersons(settings);
+  const whatsappMessage =
+    settings?.whatsappMessage ||
+    'Merhaba, blog yazınızı inceliyorum. Projem için bilgi ve teklif almak istiyorum.';
 
   const allPosts = await getAllPosts();
   const relatedPosts = allPosts
@@ -265,7 +272,7 @@ export default async function BlogPostDetailPage({ params }: BlogPostPageProps) 
             {/* Right Sticky Sidebar */}
             <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
               <TableOfContents contentHtml={post.contentHtml} />
-              <StickyCta />
+              <StickyCta contacts={contacts} whatsappMessage={whatsappMessage} />
             </aside>
 
           </div>
