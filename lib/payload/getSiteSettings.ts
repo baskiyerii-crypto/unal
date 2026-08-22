@@ -8,6 +8,7 @@ export async function getSiteSettings() {
     const payload = await getPayload({ config });
     const settings = await payload.findGlobal({
       slug: 'site-settings',
+      depth: 2,
     });
 
     if (!settings) {

@@ -26,6 +26,8 @@ const inter = Inter({
   display: 'swap',
 });
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'MenakYapı — Kenet Çatı Sistemleri, Yapı & Çatı Tadilatı | Ankara & Antalya',
   description:

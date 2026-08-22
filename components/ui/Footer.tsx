@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Phone, Mail, MapPin, Clock, ShieldCheck, MessageCircle } from 'lucide-react';
-import { ContactPicker, type ContactPickerMode } from '@/components/ui/ContactPicker';
 import {
   type ContactPerson,
   DEFAULT_CONTACT_PERSONS,
   DEFAULT_WHATSAPP_MESSAGE,
   formatPhoneDisplay,
+  toTelHref,
+  toWhatsAppHref,
 } from '@/lib/utils/contacts';
 
 interface FooterProps {
@@ -26,12 +27,8 @@ export function Footer({
   address = 'Şehitler caddesi Selahattin Ecevit sokak 36/3 Mamak Ankara',
   workingHours = 'Hafta içi 08:00 - 17:00',
 }: FooterProps) {
-  const [pickerMode, setPickerMode] = useState<ContactPickerMode | null>(null);
-  const primaryLabel = formatPhoneDisplay(contacts[0]?.phone || '05317924006');
-
   return (
-    <>
-      <footer className="bg-[#24292E] text-white pt-16 pb-8 border-t-4 border-[#D4AF37]">
+    <footer className="bg-[#24292E] text-white pt-16 pb-8 border-t-4 border-[#D4AF37]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-gray-700/60">
             <div className="space-y-4">
@@ -87,28 +84,27 @@ export function Footer({
                   <span>{address}</span>
                 </li>
                 {contacts.map((person) => (
-                  <li key={`footer-call-${person.name}-${person.phone}`} className="flex items-center gap-3">
-                    <Phone className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                    <button
-                      type="button"
-                      onClick={() => setPickerMode('call')}
-                      className="hover:text-white font-medium text-left cursor-pointer"
-                    >
+                  <li key={`footer-call-${person.name}-${person.phone}`} className="flex items-start gap-3">
+                    <Phone className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                    <a href={toTelHref(person.phone)} className="hover:text-white font-medium">
                       <span className="block text-white">{person.name}</span>
                       <span className="text-xs text-gray-400">{formatPhoneDisplay(person.phone)}</span>
-                    </button>
+                    </a>
                   </li>
                 ))}
-                <li className="flex items-center gap-3">
-                  <MessageCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <button
-                    type="button"
-                    onClick={() => setPickerMode('whatsapp')}
-                    className="hover:text-emerald-400 font-medium cursor-pointer"
-                  >
-                    WhatsApp: {primaryLabel}
-                  </button>
-                </li>
+                {contacts.map((person) => (
+                  <li key={`footer-wa-${person.name}-${person.phone}`} className="flex items-center gap-3">
+                    <MessageCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <a
+                      href={toWhatsAppHref(person.phone, whatsappMessage)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-emerald-400 font-medium"
+                    >
+                      WhatsApp · {person.name}
+                    </a>
+                  </li>
+                ))}
                 <li className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-[#D4AF37] shrink-0" />
                   <a href={`mailto:${email}`} className="hover:text-white">
@@ -148,13 +144,5 @@ export function Footer({
           </div>
         </div>
       </footer>
-
-      <ContactPicker
-        contacts={contacts}
-        mode={pickerMode}
-        onClose={() => setPickerMode(null)}
-        whatsappMessage={whatsappMessage}
-      />
-    </>
   );
 }

@@ -6,6 +6,14 @@ export const SiteSettings: GlobalConfig = {
   access: {
     read: () => true,
   },
+  hooks: {
+    afterChange: [
+      async () => {
+        const { revalidatePath } = await import('next/cache');
+        revalidatePath('/', 'layout');
+      },
+    ],
+  },
   fields: [
     {
       name: 'contactPersons',

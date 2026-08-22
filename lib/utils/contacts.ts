@@ -24,7 +24,8 @@ export function formatPhoneDisplay(phone: string): string {
 }
 
 export function toTelHref(phone: string): string {
-  return `tel:${normalizePhone(phone)}`;
+  const digits = normalizePhone(phone);
+  return digits ? `tel:${digits}` : 'tel:';
 }
 
 export function toWhatsAppHref(phone: string, message?: string): string {

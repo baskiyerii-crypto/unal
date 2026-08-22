@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Phone, MessageCircle, ShieldCheck, Menu, X } from 'lucide-react';
-import { ContactPicker, type ContactPickerMode } from '@/components/ui/ContactPicker';
 import {
   type ContactPerson,
   DEFAULT_CONTACT_PERSONS,
   DEFAULT_WHATSAPP_MESSAGE,
   formatPhoneDisplay,
+  toTelHref,
+  toWhatsAppHref,
 } from '@/lib/utils/contacts';
 
 interface HeaderProps {
@@ -21,9 +22,6 @@ export function Header({
   whatsappMessage = DEFAULT_WHATSAPP_MESSAGE,
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [pickerMode, setPickerMode] = useState<ContactPickerMode | null>(null);
-
-  const primaryLabel = formatPhoneDisplay(contacts[0]?.phone || '05317924006');
 
   const navLinks = [
     { href: '/', label: 'Anasayfa' },
@@ -46,24 +44,32 @@ export function Header({
               <span className="hidden md:inline text-gray-500">|</span>
               <span className="hidden md:inline text-gray-300">Ankara • Antalya • Tüm Türkiye</span>
             </div>
-            <div className="flex items-center gap-4 font-medium whitespace-nowrap">
-              <button
-                type="button"
-                onClick={() => setPickerMode('call')}
-                className="hover:text-[#D4AF37] transition-colors flex items-center gap-1 whitespace-nowrap cursor-pointer"
-              >
-                <Phone className="w-3 h-3 text-[#D4AF37] shrink-0" />
-                <span className="whitespace-nowrap">{primaryLabel}</span>
-              </button>
-              <span className="text-gray-500">|</span>
-              <button
-                type="button"
-                onClick={() => setPickerMode('whatsapp')}
-                className="hover:text-emerald-400 transition-colors flex items-center gap-1 whitespace-nowrap cursor-pointer"
-              >
-                <MessageCircle className="w-3 h-3 text-emerald-400 shrink-0" />
-                WhatsApp
-              </button>
+            <div className="flex items-center gap-3 font-medium flex-wrap justify-center">
+              {contacts.map((person) => (
+                <a
+                  key={`header-tel-${person.name}-${person.phone}`}
+                  href={toTelHref(person.phone)}
+                  className="hover:text-[#D4AF37] transition-colors flex items-center gap-1 whitespace-nowrap"
+                >
+                  <Phone className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                  <span className="whitespace-nowrap">
+                    {person.name} · {formatPhoneDisplay(person.phone)}
+                  </span>
+                </a>
+              ))}
+              <span className="text-gray-500 hidden sm:inline">|</span>
+              {contacts.map((person) => (
+                <a
+                  key={`header-wa-${person.name}-${person.phone}`}
+                  href={toWhatsAppHref(person.phone, whatsappMessage)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-emerald-400 transition-colors flex items-center gap-1 whitespace-nowrap"
+                >
+                  <MessageCircle className="w-3 h-3 text-emerald-400 shrink-0" />
+                  {person.name}
+                </a>
+              ))}
             </div>
           </div>
         </div>
@@ -97,14 +103,21 @@ export function Header({
             </nav>
 
             <div className="flex items-center gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={() => setPickerMode('call')}
-                className="hidden lg:flex items-center gap-2 btn-primary text-xs whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <Phone className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-                <span className="whitespace-nowrap">{primaryLabel}</span>
-              </button>
+            <div className="hidden lg:flex items-center gap-2 shrink-0">
+              {contacts.map((person) => (
+                <a
+                  key={`header-cta-${person.name}-${person.phone}`}
+                  href={toTelHref(person.phone)}
+                  className="flex items-center gap-1.5 btn-primary text-[11px] whitespace-nowrap px-3 py-2"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                  <span className="flex flex-col items-start leading-tight">
+                    <span className="font-bold">{person.name}</span>
+                    <span className="opacity-90">{formatPhoneDisplay(person.phone)}</span>
+                  </span>
+                </a>
+              ))}
+            </div>
               <a href="#teklif-al" className="btn-accent text-xs whitespace-nowrap shrink-0">
                 Teklif Al
               </a>
@@ -139,40 +152,35 @@ export function Header({
                 </Link>
               ))}
               <div className="pt-3 mt-3 border-t border-gray-100 flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setPickerMode('call');
-                  }}
-                  className="flex items-center justify-center gap-2 btn-primary text-xs w-full cursor-pointer"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  {primaryLabel}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setPickerMode('whatsapp');
-                  }}
-                  className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-3 rounded-full transition-all w-full cursor-pointer"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  WhatsApp ile Yazın
-                </button>
+                {contacts.map((person) => (
+                  <a
+                    key={`header-mobile-tel-${person.name}-${person.phone}`}
+                    href={toTelHref(person.phone)}
+                    className="flex items-center justify-center gap-2 btn-primary text-xs w-full"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    {person.name} · {formatPhoneDisplay(person.phone)}
+                  </a>
+                ))}
+                {contacts.map((person) => (
+                  <a
+                    key={`header-mobile-wa-${person.name}-${person.phone}`}
+                    href={toWhatsAppHref(person.phone, whatsappMessage)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-3 rounded-full transition-all w-full"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    WhatsApp · {person.name}
+                  </a>
+                ))}
               </div>
             </nav>
           </div>
         )}
       </header>
-
-      <ContactPicker
-        contacts={contacts}
-        mode={pickerMode}
-        onClose={() => setPickerMode(null)}
-        whatsappMessage={whatsappMessage}
-      />
     </>
   );
 }
